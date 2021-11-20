@@ -9,8 +9,9 @@ import NFT from "../artifacts/contracts/NFT.sol/NFT.json";
 import KBMarket from "../artifacts/contracts/KBMarket.sol/KBMarket.json";
 //import { loadDefaultErrorComponents } from "next/dist/server/load-components";
 
-export default function Home() {
+export default function AccountDashboard() {
   const [nfts, setNfts] = useState([]);
+  const [sold,setSold]=useState([])
   const [loadingState, setLoadingState] = useState("not-loaded");
 
   useEffect(() => {
@@ -20,13 +21,17 @@ export default function Home() {
   //can be replaced by async function loadNFTs(){}
   async function loadNFTs(){
     //what we wanna load
-    //provider, tokenContract,marketContract,data for market items
+    //we want to the display the nfts of the msg.sender 
 
-    const provider = new ethers.providers.JsonRpcProvider();
-    const tokenContract = new ethers.Contract(nftaddress,NFT.abi, provider);
-    const marketContract = new ethers.Contract(nftmarketaddress,KBMarket.abi,provider);
+    //const provider = new ethers.providers.JsonRpcProvider();
+    const web3Modal=new Web3Modal()
+    const connection = await web3Modal.connect()
+    const provider=new ethers.providers.Web3Provider(connection)
+    const signer=provider.getSigner()
+    const tokenContract = new ethers.Contract(nftaddress,NFT.abi, signer);
+    const marketContract = new ethers.Contract(nftmarketaddress,KBMarket.abi,signer);
 
-    const data = await marketContract.fetchMarketTokens();
+    const data = await marketContract.fetchItemsCreated();
 
     const items = await Promise.all(
       data.map(async (i) => {
@@ -47,40 +52,30 @@ export default function Home() {
         return item;
       })
     );
-
+    //create a filtered array of items sold by the msg.sender
+    const soldItems=items.filter(i=>i.sold)
+    setSold(soldItems)
     setNfts(items);
     setLoadingState("loaded");
   }
   
   //function buy nfts for the market
   
-  //can be replaced by async function buyNFTs(){}
-  async function buyNFTs(nft){
-     const web3Modal=new Web3Modal()
-     const connection = await web3Modal.connect()//connect tho metamask or which ever Wallet the user has
-     const provider = new ethers.providers.Web3Provider(connection)
-     const signers=provider.getSigner()//when initiating transaction we need signers
-     const contract= new ethers.Contract(nftmarketaddress,KBMarket.abi,signers)
-     
-     const price=ethers.utils.parseUnits(nft.price.toString(),'ether')
-     const transaction= await contract.createMarketSale(nftaddress,nft.tokenId,{value:price})
-     await transaction.wait()
-     loadNFTs()
-  }
-
+  
   if (loadingState==='loaded'& !nfts.length){
     return(
       <div className="flex items-center bg-black-500 text-black font-bold px-4 py-3 justify-center" role="alert">
         <svg className="fill-current w-4 h-4 mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
           <path d="M12.432 0c1.34 0 2.01.912 2.01 1.957 0 1.305-1.164 2.512-2.679 2.512-1.269 0-2.009-.75-1.974-1.99C9.789 1.436 10.67 0 12.432 0zM8.309 20c-1.058 0-1.833-.652-1.093-3.524l1.214-5.092c.211-.814.246-1.141 0-1.141-.317 0-1.689.562-2.502 1.117l-.528-.88c2.572-2.186 5.531-3.467 6.801-3.467 1.057 0 1.233 1.273.705 3.23l-1.391 5.352c-.246.945-.141 1.271.106 1.271.317 0 1.357-.392 2.379-1.207l.6.814C12.098 19.02 9.365 20 8.309 20z"/>
         </svg>
-        <p style={{color:"black"}}>No NFTs in the MarketPlace</p>
+        <p style={{color:"black"}}>You do not have any NFTs currently minted </p>
       </div>
     )
   }
 
   return (
-  <div className='flex justify-center'>
+  <div className='p-4'>
+      <h1 className='text-2x1 py-2 align-center'>Tokens Minted</h1>
      <div className='px-4' style={{maxWidth:'1600px',opacity:'0.8'}} height='500' width='600' >
        <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 pt-4'>
           {
@@ -95,7 +90,8 @@ export default function Home() {
                   </div>
                   <div className='p-4 bg-black'>
                     <p className='mb-4 text-4x1 font-bold'style={{color:'aquamarine'}}>Price: {nft.price}ETH</p>
-                    <button className='w-full bg-green-500 text-black font-bold py-3 rounded' onClick={()=>buyNFTs(nft)}>BUY</button>            
+                    
+                               
                     
                   </div>
               </div>

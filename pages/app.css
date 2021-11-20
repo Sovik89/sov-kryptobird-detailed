@@ -1,0 +1,46 @@
+*{
+    box-sizing:border-box;
+}
+
+body {
+    height:100vh;
+    width:100%;
+    margin:0;
+    background: linear-gradient(-45deg, #256f81, #3ce792, #2d77e6, #b4d523);
+    animation: gradientBG 15s ease infinite;
+    background-size: 400% 400%;
+}
+
+@keyframes gradientBG {
+    0% {
+        background-position: 0% 50%;
+    }
+
+    50% {
+        background-position: 100% 50%;
+    }
+
+    1000% {
+        background-position: 0% 50%;
+    }
+
+}
+
+
+p{
+    color:aquamarine;
+    transition: all 0.2s;
+}
+
+a{
+    color:aquamarine;
+    transition: all 0.2s;
+}
+
+a:hover{
+    opacity: 0.6;
+}
+
+a:active{
+    opacity:1;
+}
