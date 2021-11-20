@@ -1,4 +1,4 @@
-# Basic Sample Hardhat Project
+# Detailed Kryptobirdz Hardhat Project
 
 This project demonstrates a basic Hardhat use case. It comes with a sample contract, a test for that contract, a sample script that deploys that contract, and an example of a task implementation, which simply lists the available accounts.
 
@@ -13,7 +13,7 @@ npx hardhat node
 node scripts/sample-script.js
 npx hardhat help
 ```
-Krypto Bird Detailed
+                                                                           Krypto Bird Detailed
 
 We are creating a Nextjs project with Redhat as package manager instead of truffle.Next js is an excellent library which is smart enough to load only the necessary js and css during rendering making it  very light weight for front end heavy projects like DApps.
 
